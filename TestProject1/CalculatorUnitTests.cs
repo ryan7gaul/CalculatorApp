@@ -19,8 +19,6 @@ namespace CalculatorTest
         [Test]
         public void Test1(string input, string expected)
         {
-
-            
             var result = CalculatorLogic.EvaluateExpression(input);
             Assert.That(result, Is.EqualTo(expected));
         }

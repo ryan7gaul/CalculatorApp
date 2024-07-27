@@ -9,6 +9,7 @@ namespace CalculatorApp.Logic
             //Remove all whitespace
             expression = Regex.Replace(expression, @"\s+", "");
 
+            //Validation
             if (!CheckParenthesesMatch(expression))
                 throw new Exception("Parenthesis are not matching");
             if (!CheckCharacters(expression))
@@ -17,18 +18,6 @@ namespace CalculatorApp.Logic
             var answer = RecursiveEval(expression);
 
             return answer;
-        }
-
-        private static string RebuildString(string expression, string evaluatedValue, int startIndex, int endIndex) =>
-            expression.Substring(0, startIndex) + evaluatedValue + expression.Substring(endIndex);
-
-        private static string EvaluateParentheses(string expression)
-        {
-            var opening = expression.IndexOf("(");
-            var closing = GetClosingParenthesisIndex(expression);
-            var expressionToEvaluate = expression.Substring(opening + 1, closing - opening - 1);
-            var evaluatedString = RecursiveEval(expressionToEvaluate);
-            return RebuildString(expression, evaluatedString, opening, closing + 1);
         }
 
         private static string RecursiveEval(string expression)
@@ -91,9 +80,72 @@ namespace CalculatorApp.Logic
                     result = firstNumber - secondNumber;
                     break;
             }
-
             return RebuildString(expression, result.ToString(), index - firstNumber.ToString().Length, index + secondNumber.ToString().Length + 1);
+        }
 
+        private static double FindNumber(string expression, bool beforeOperator)
+        {
+            try
+            {
+                var pattern = @"\d|\.";
+                if (beforeOperator)
+                {
+                    //Go backwards until we reach a character that isn't part of the number.
+                    for (int i = expression.Length - 1; i > -1; i--)
+                    {
+                        char c = expression[i];
+                        if (!Regex.IsMatch(c.ToString(), pattern))
+                            return double.Parse(expression.Substring(i));
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < expression.Length; i++)
+                    {
+                        char c = expression[i];
+                        if (!Regex.IsMatch(c.ToString(), pattern))
+                            return double.Parse(expression.Substring(0, i));
+                    }
+                }
+                return double.Parse(expression);
+            }
+            catch
+            {
+                throw new Exception("Invalid input");
+            }
+
+        }
+
+        private static string RebuildString(string expression, string evaluatedValue, int startIndex, int endIndex) =>
+            expression.Substring(0, startIndex) + evaluatedValue + expression.Substring(endIndex);
+
+        private static string EvaluateParentheses(string expression)
+        {
+            var opening = expression.IndexOf("(");
+            var closing = GetClosingParenthesisIndex(expression);
+            var expressionToEvaluate = expression.Substring(opening + 1, closing - opening - 1);
+            var evaluatedString = RecursiveEval(expressionToEvaluate);
+            return RebuildString(expression, evaluatedString, opening, closing + 1);
+        }
+
+        private static int GetClosingParenthesisIndex(string expression)
+        {
+            Stack<char> parentheses = new Stack<char>();
+            for (int i = 0; i < expression.Length; i++)
+            {
+                char c = expression[i];
+                if (c == '(')
+                {
+                    parentheses.Push(c);
+                }
+                if (c == ')')
+                {
+                    parentheses.Pop();
+                    if (parentheses.Count == 0)
+                        return i;
+                }
+            }
+            return 0;
         }
 
         private static bool CheckParenthesesMatch(string expression)
@@ -127,56 +179,8 @@ namespace CalculatorApp.Logic
             return r.IsMatch(expression);
         }
 
-        private static int GetClosingParenthesisIndex(string expression)
-        {
-            Stack<char> parentheses = new Stack<char>();
-            for (int i = 0; i < expression.Length; i++)
-            {
-                char c = expression[i];
-                if (c == '(')
-                {
-                    parentheses.Push(c);
-                }
-                if (c == ')')
-                {
-                    parentheses.Pop();
-                    if (parentheses.Count == 0)
-                        return i;
-                }
-            }
-            return 0;
-        }
+       
 
-        private static double FindNumber(string expression, bool beforeOperator)
-        {
-            try
-            {
-                var pattern = @"\d|\.";
-                if (beforeOperator)
-                {
-                    //Go backwards until we reach a character that isn't part of the number.
-                    for (int i = expression.Length - 1; i > -1; i--)
-                    {
-                        char c = expression[i];
-                        if (!Regex.IsMatch(c.ToString(), pattern))
-                            return double.Parse(expression.Substring(i));
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < expression.Length; i++)
-                    {
-                        char c = expression[i];
-                        if (!Regex.IsMatch(c.ToString(), pattern))
-                            return double.Parse(expression.Substring(0, i));
-                    }
-                }
-                return double.Parse(expression);
-            }
-            catch {
-                throw new Exception ("Invalid input");
-            }
-
-        }
+       
     }
 }
