@@ -16,6 +16,8 @@ namespace CalculatorTest
         [TestCase("36-5+4+8", "43")]
         [TestCase("5*2*3*2", "60")]
         [TestCase("36-5+4+8/2", "39")]
+        [TestCase("36 - 5 + 4 + 8 / 2", "39")]
+        [TestCase("( ( 83 + 34 ) / ( 3 + 3 ) )*5", "97.5")]
         [Test]
         public void Test1(string input, string expected)
         {
@@ -31,6 +33,7 @@ namespace CalculatorTest
         [TestCase("30+6-7*/8", "Invalid input")]
         [TestCase("123+45a", "Invalid input")]
         [TestCase("4/0", "Divide by zero error")]
+        [TestCase("", "Input is empty")]
         [Test]
         public void Test2(string input, string expected)
         {

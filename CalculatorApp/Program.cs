@@ -36,7 +36,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Calculator}/{id?}");
+    pattern: "{controller=Calculator}/{action=Calculator}/{id?}");
 app.MapRazorPages();
 
 app.Run();

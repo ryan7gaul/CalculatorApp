@@ -9,16 +9,12 @@ using System.Runtime.CompilerServices;
 
 namespace CalculatorController
 {
-    public class HomeController : Controller
+    public class CalculatorController : Controller
     {
         private readonly ApplicationDbContext _context;
-        public HomeController(ApplicationDbContext context)
+        public CalculatorController(ApplicationDbContext context)
         {
             _context = context;
-        }
-        public IActionResult Index()
-        {
-            return View();
         }
 
         public IActionResult Calculator(CalculatorViewModel model)
@@ -38,20 +34,19 @@ namespace CalculatorController
         {
             var input = model.Input;
             var userId = User.Identity?.Name;
-            if (model.Input != null)
+            
+            try
             {
-                try
-                {
-                    model.Input = CalculatorLogic.EvaluateExpression(model.Input).ToString();
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("Input", ex.Message);
-                    if(!string.IsNullOrEmpty(userId))
-                        model.CalculatorHistories = GetCalculatorHistories(userId);
-                    return View("Calculator", model);
-                }
+                model.Input = CalculatorLogic.EvaluateExpression(model.Input);
             }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("Input", ex.Message);
+                if(!string.IsNullOrEmpty(userId))
+                    model.CalculatorHistories = GetCalculatorHistories(userId);
+                return View("Calculator", model);
+            }
+            
             ViewData["model"] = model;
             if (!string.IsNullOrEmpty(userId))
             {

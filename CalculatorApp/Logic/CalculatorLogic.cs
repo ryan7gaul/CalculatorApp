@@ -6,6 +6,10 @@ namespace CalculatorApp.Logic
     {
         public static string EvaluateExpression(string expression)
         {
+            if (string.IsNullOrEmpty(expression))
+            {
+                throw new Exception("Input is empty");
+            }
             //Remove all whitespace
             expression = Regex.Replace(expression, @"\s+", "");
 
@@ -15,12 +19,12 @@ namespace CalculatorApp.Logic
             if (!CheckCharacters(expression))
                 throw new Exception("Invalid input");
 
-            var answer = RecursiveEval(expression);
+            var answer = Calculate(expression);
 
             return answer;
         }
 
-        private static string RecursiveEval(string expression)
+        private static string Calculate(string expression)
         {
             while (expression.Contains('('))
             {
@@ -35,7 +39,7 @@ namespace CalculatorApp.Logic
                 for (int i = 0; i < expression.Length; i++)
                 {
                     char c = expression[i];
-                    if (c == '*' || c == 'x' || c == '/')
+                    if (highOrderOperators.Contains(c))
                     {
                         expression = Evaluate(expression, i, c);
                     }
@@ -48,7 +52,7 @@ namespace CalculatorApp.Logic
                 for (int i = 0; i < expression.Length; i++)
                 {
                     char c = expression[i];
-                    if (c == '+' || c == '-')
+                    if (lowOrderOperators.Contains(c))
                         expression = Evaluate(expression, i, c);
                 }
             }
@@ -124,7 +128,7 @@ namespace CalculatorApp.Logic
             var opening = expression.IndexOf("(");
             var closing = GetClosingParenthesisIndex(expression);
             var expressionToEvaluate = expression.Substring(opening + 1, closing - opening - 1);
-            var evaluatedString = RecursiveEval(expressionToEvaluate);
+            var evaluatedString = Calculate(expressionToEvaluate);
             return RebuildString(expression, evaluatedString, opening, closing + 1);
         }
 
@@ -178,9 +182,5 @@ namespace CalculatorApp.Logic
             Regex r = new Regex("^[()+\\-*/x0123456789]+$");
             return r.IsMatch(expression);
         }
-
-       
-
-       
     }
 }
