@@ -1,0 +1,21 @@
+﻿@model CalculatorViewModel
+@{
+    ViewData["Title"] = "Calculator";
+}
+<div class="row">
+    <div class="col-md-4">
+        <form action="/home/Calculate" method="post">
+            @Html.ValidationMessageFor(m => m.Input)
+            <input type="text" value="@Model.Input" name="Input" />
+            
+            <input type="submit" name="submit" value="=" />
+        </form>
+    </div>
+    <div class="col-md-4">
+        @foreach (var item in @Model.CalculatorHistories)
+        {
+            <div>Input: @item.Input</div>
+            <div style="padding:20px">Output: @item.Output</div>
+        }
+    </div>
+</div>
